@@ -1,0 +1,26 @@
+@import "../../metrics.module";
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.content-view-training {
+
+  .label {
+    color: $secundaryColor;
+    font-size: large;
+  }
+}
+
+.box-button-dialog {
+  display: flex;
+  width: 100%;
+  padding: 20px 20px 5px;
+  flex-direction: column;
+  bottom: 0;
+  position: sticky;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}

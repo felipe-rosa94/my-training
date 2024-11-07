@@ -1,0 +1,54 @@
+@import "../../metrics.module";
+
+.training {
+
+  .container {
+    display: flex;
+    flex-direction: row;
+
+    @media (max-width: 800px) {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .card {
+      width: 250px;
+      margin-right: 10px;
+
+      @media (max-width: 800px) {
+        width: 100%;
+        margin-right: 0;
+      }
+
+      margin-top: 8px;
+      background-color: #242424;
+      border-radius: 15px;
+      border: 1px solid $secundaryColor;
+
+      .card-content {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 16px;
+        gap: 10px;
+
+        .box-content {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .icon {
+          color: $secundaryColor;
+        }
+      }
+    }
+  }
+
+  .fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+  }
+}

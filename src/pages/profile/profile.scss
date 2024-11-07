@@ -1,0 +1,36 @@
+@import "../../metrics.module";
+
+.profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 250px;
+    margin-top: 50px;
+
+    .fitness-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 10px;
+    }
+
+    .form-control-sex {
+      margin-top: 10px;
+
+      .title {
+        color: $secundaryColor;
+        text-align: left;
+      }
+
+      .radio-group {
+        display: flex;
+        flex-direction: row;
+      }
+    }
+  }
+}
