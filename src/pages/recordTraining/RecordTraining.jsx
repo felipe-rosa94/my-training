@@ -55,7 +55,7 @@ const RecordTraining = () => {
             })
         })
 
-        const t = {
+        const registre = {
             id: (!!data.id) ? data.id : new Date().getTime(),
             name: data.name,
             data: exercises,
@@ -63,10 +63,10 @@ const RecordTraining = () => {
         }
 
         if (!data.id) {
-            savedTrainings.push(t)
+            savedTrainings.push(registre)
         } else {
             const index = savedTrainings.findIndex((st) => (st.id === data.id))
-            savedTrainings[index] = t
+            savedTrainings[index] = registre
         }
 
         setLocal('savedTrainings', savedTrainings)
