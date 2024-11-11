@@ -11,15 +11,18 @@
       justify-content: center;
     }
 
-
+    .cont-training {
+      .label {
+        color: $secundaryColor;
+      }
+    }
   }
 
   .box-footer {
     display: flex;
     width: 100%;
-    align-items: center;
-    justify-content: center;
-    bottom: 0;
+    left: 20px;
+    bottom: 10px;
     position: fixed;
 
     .label {

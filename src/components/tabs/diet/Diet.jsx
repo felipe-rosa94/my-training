@@ -38,13 +38,16 @@ const Diet = () => {
 
     const handleCloseViewDiet = () => setView({...view, open: false})
 
-    const handleClickConfirmation = data => setConfirmation({
-        open: true,
-        title: 'Concluir treino',
-        message: 'Deseja confirmar a conclusão do treino?',
-        data: data,
-        type: 'complete diet'
-    })
+    const handleClickConfirmation = data => {
+        setConfirmation({
+            open: true,
+            title: 'Concluir treino',
+            message: 'Deseja confirmar a conclusão da refeição?',
+            data: data,
+            type: 'complete diet'
+        })
+        handleCloseViewDiet()
+    }
     const clickConfirmation = (data, type) => {
         if (type === 'complete diet') {
             completeDiet(data)

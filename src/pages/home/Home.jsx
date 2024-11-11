@@ -5,7 +5,7 @@ import {
     clearLocal,
     clearSession,
     getLocal,
-    getSession,
+    getSession, removeLocal,
     setLocal,
     setSession
 } from '../../hooks/useStorage/useStorage.jsx'
@@ -17,7 +17,8 @@ import {
     ClearAll as ClearAllIcon,
     DeleteRounded as DeleteIcon,
     UploadRounded as UploadIcon,
-    DownloadRounded as DownloadIcon
+    DownloadRounded as DownloadIcon,
+    FlashOnRounded as FlashIcon
 } from '@mui/icons-material'
 import {
     AppBar,
@@ -41,6 +42,7 @@ import Training from '../../components/tabs/traninig/Training.jsx'
 import './home.scss'
 import {DialogConfirmation} from "../../components/dialogs/Dialogs.jsx";
 import {randomLetters, randomNumber} from "react-lf-tools";
+import {HomeContext} from "../../context/HomeContext.jsx";
 
 const TabPanel = (props) => {
     const {children, value, index, ...other} = props
@@ -65,6 +67,7 @@ const Home = () => {
     const navigate = useNavigate()
     const [selectedFile, setSelectedFile] = useState(null)
     const fileInputRef = useRef(null)
+    const [contTraining, setContTraining] = useState(getLocal('contTraining', 0))
 
     const [confirmation, setConfirmation] = useState({
         open: false,
@@ -83,10 +86,33 @@ const Home = () => {
     const handleClose = () => {
         setAnchorEl(null)
     }
+    const hadleClickDeleteTraining = () => setConfirmation({
+        open: true,
+        title: 'Deletar treinos',
+        message: 'Deseja apagar todos os treinos salvos?',
+        data: '',
+        type: 'delete training'
+    })
     const openFileExplorer = () => {
         fileInputRef.current.value = '';
         fileInputRef.current.click()
         handleClose()
+    }
+    const handleClickExportTraning = () => {
+        const savedTrainings = getLocal('savedTrainings', [])
+        let txt = ''
+        savedTrainings.forEach((st) => {
+            txt += `${st.name.trim()}\n;\n${st.textData.trim()}\n///\n`
+        })
+        const blob = new Blob([txt], {type: 'text/plain'})
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = 'treino.txt'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        URL.revokeObjectURL(url)
     }
     const handleFileChange = (event) => {
         const file = event.target.files[0]
@@ -105,26 +131,32 @@ const Home = () => {
         reader.readAsText(file)
     }
     const importTraining = value => {
+        removeLocal('savedTrainings')
         const savedTrainings = getLocal('savedTrainings', [])
         value.split('///').forEach((v) => {
-            const t = v.split(';')
-            const arrData = []
-            const txtData = t[1].slice(2, -2)
-            txtData.split('\n').forEach((e) => arrData.push({
-                id: randomLetters() + randomNumber(),
-                checked: false,
-                name: e
-            }))
-            const training = {
-                id: new Date().getTime(),
-                name: t[0],
-                data: arrData,
-                textData: txtData
+            if (v !== '') {
+                const t = v.split(';')
+                const arrData = []
+                const txtData = trimNewLines(t[1])
+                txtData.split('\n').forEach((e) => arrData.push({
+                    id: randomLetters() + randomNumber(),
+                    checked: false,
+                    name: e
+                }))
+                const training = {
+                    id: new Date().getTime(),
+                    name: t[0],
+                    data: arrData,
+                    textData: txtData
+                }
+                savedTrainings.push(training)
             }
-            savedTrainings.push(training)
         })
         setLocal('savedTrainings', savedTrainings)
         window.location.reload()
+    }
+    const trimNewLines = (str) => {
+        return str.replace(/^[\n\r]+|[\n\r]+$/g, '')
     }
     const handleChange = (event, newValue) => {
         setValue(newValue)
@@ -147,6 +179,9 @@ const Home = () => {
             clearLocal()
             clearSession()
             window.location.reload()
+        } else if (type === 'delete training') {
+            removeLocal('savedTrainings')
+            window.location.reload()
         }
     }
     const handleCloseConfirmation = () => setConfirmation({...confirmation, open: false})
@@ -164,6 +199,16 @@ const Home = () => {
                 <Typography variant={'h6'} sx={{flexGrow: 1}}>
                     My training
                 </Typography>
+                <IconButton
+                    sx={{mr: 2}}
+                    onClick={handleClick}>
+                    <FlashIcon color={'secondary'}/>
+                    <Box className={'cont-training'}>
+                        <FormLabel className={'label'}>
+                            {contTraining}
+                        </FormLabel>
+                    </Box>
+                </IconButton>
                 <IconButton
                     sx={{mr: 2}}
                     onClick={handleClick}>
@@ -198,7 +243,7 @@ const Home = () => {
                                 Importar treino
                             </FormLabel>
                         </MenuItem>
-                        <MenuItem onClick={handleClickResetData}>
+                        <MenuItem onClick={handleClickExportTraning}>
                             <ListItemIcon>
                                 <DownloadIcon fontSize={'small'}/>
                             </ListItemIcon>
@@ -206,7 +251,7 @@ const Home = () => {
                                 Exportar treino
                             </FormLabel>
                         </MenuItem>
-                        <MenuItem onClick={openFileExplorer}>
+                        <MenuItem onClick={hadleClickDeleteTraining}>
                             <ListItemIcon>
                                 <DeleteIcon fontSize={'small'}/>
                             </ListItemIcon>
@@ -214,7 +259,7 @@ const Home = () => {
                                 Deletar treinos
                             </FormLabel>
                         </MenuItem>
-                        <MenuItem onClick={openFileExplorer}>
+                        <MenuItem onClick={handleClickResetData}>
                             <ListItemIcon>
                                 <ClearAllIcon fontSize={'small'}/>
                             </ListItemIcon>
@@ -239,15 +284,17 @@ const Home = () => {
                 </Tabs>
             </Box>
         </AppBar>
-        <TabPanel value={value} index={0}>
-            <Training/>
-        </TabPanel>
-        <TabPanel value={value} index={1}>
-            <Diet/>
-        </TabPanel>
-        <TabPanel value={value} index={2}>
-            <UserData/>
-        </TabPanel>
+        <HomeContext.Provider value={{setContTraining}}>
+            <TabPanel value={value} index={0}>
+                <Training/>
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+                <Diet/>
+            </TabPanel>
+            <TabPanel value={value} index={2}>
+                <UserData/>
+            </TabPanel>
+        </HomeContext.Provider>
         <Box className={'box-footer'}>
             <FormLabel className={'label'}>
                 {import.meta.env.VITE_VERSION}

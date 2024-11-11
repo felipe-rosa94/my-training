@@ -1,9 +1,10 @@
-import {useState} from 'react'
+import {useContext, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {getLocal, setLocal} from '../../../hooks/useStorage/useStorage.jsx'
 
 import {Box, Card, CardContent, Fab, IconButton, Typography} from '@mui/material'
 import {AddRounded as AddIcon, FitnessCenterRounded as FitnessIcon, EditRounded as EditIcon} from '@mui/icons-material'
+import {HomeContext} from '../../../context/HomeContext.jsx'
 
 import {DialogConfirmation, DialogView} from '../../dialogs/Dialogs.jsx'
 
@@ -11,6 +12,7 @@ import '../training-diet.scss'
 
 const Training = () => {
 
+    const {setContTraining} = useContext(HomeContext)
     const navigate = useNavigate()
     const savedTrainings = getLocal('savedTrainings', [])
 
@@ -44,13 +46,16 @@ const Training = () => {
 
     const handleCloseViewTrainig = () => setView({...view, open: false})
 
-    const handleClickConfirmation = data => setConfirmation({
-        open: true,
-        title: 'Concluir treino',
-        message: 'Deseja confirmar a conclusão do treino?',
-        data: data,
-        type: 'complete training'
-    })
+    const handleClickConfirmation = data => {
+        setConfirmation({
+            open: true,
+            title: 'Concluir treino',
+            message: 'Deseja confirmar a conclusão do treino?',
+            data: data,
+            type: 'complete training'
+        })
+        handleCloseViewTrainig()
+    }
 
     const clickConfirmation = (data, type) => {
         if (type === 'complete training') {
@@ -64,6 +69,9 @@ const Training = () => {
         savedTrainings[index].data.forEach((ste) => {
             ste.checked = false
         })
+        let contTraining = getLocal('contTraining', 0)
+        setLocal('contTraining', ++contTraining)
+        setContTraining(contTraining)
         setLocal('savedTrainings', savedTrainings)
         setConfirmation({...confirmation, open: false})
         setView({...view, open: false})

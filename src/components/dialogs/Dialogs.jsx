@@ -69,7 +69,7 @@ export const DialogView = ({open, onClose: handleClose, onClick: handleClickConf
                     variant={'contained'}
                     color={'secondary'}
                     onClick={() => handleClickConfirmation(data.id)}>
-                    Concluir treino
+                    Concluir
                 </Button>
             </Box>
         </Dialog>
